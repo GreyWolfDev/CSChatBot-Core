@@ -14,4 +14,8 @@
     <ProjectReference Include="..\ModuleFramework\ModuleFramework.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="echo F|xcopy /y $(TargetPath) &quot;$(SolutionDir)CSChatBot-Core\$(OutDir)Addon Modules\$(TargetFileName)&quot;" />
+  </Target>
+
 </Project>
