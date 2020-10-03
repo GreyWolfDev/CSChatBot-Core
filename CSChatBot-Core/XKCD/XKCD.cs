@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DB;
 using DB.Models;
+using HtmlAgilityPack;
 using ModuleFramework;
 using Newtonsoft.Json;
 using Telegram.Bot;
@@ -30,7 +31,7 @@ namespace XKCD
 
         [ChatCommand(Triggers = new[] { "xkcd" }, HelpText = "Gets a random xkcd, or searches", Parameters = new[] { "none - random", "<search query>", "'new' - latest" })]
         public static CommandResponse GetXkcd(CommandEventArgs args)
-        {
+        { 
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             // Use SecurityProtocolType.Ssl3 if needed for compatibility reasons
@@ -62,26 +63,28 @@ namespace XKCD
                     }
                     else
                     {
+                        var web = new HtmlWeb();
+
+
                         //search
                         var url = $"https://www.google.com/search?q={args.Parameters} inurl:https://xkcd.com";
-                        var page = new WebClient { UseDefaultCredentials = true }.DownloadString(url);
+                        var doc = web.Load(url);
 
-                        page = page.Substring(page.IndexOf("<div id=\"search\">"));
-                        page = page.Substring(page.IndexOf("q=") + 2);
-                        page = page.Substring(0, page.IndexOf("/&amp")).Replace("https://xkcd.com/", "");
-                        if (page == "https://xkcd.com")
-                        {
-                            //latest post
-                            chosen =
-                            JsonConvert.DeserializeObject<XkcdPost>(
-                            new WebClient().DownloadString($"https://xkcd.com/info.0.json"));
-                        }
-                        else
-                        {
-                            chosen =
-                            JsonConvert.DeserializeObject<XkcdPost>(
-                                new WebClient().DownloadString($"https://xkcd.com/{page}/info.0.json"));
-                        }
+                        //var results = doc.DocumentNode.SelectNodes("//div[@class='g']");
+                        //var top = results[0];
+                        var page = doc.DocumentNode.SelectSingleNode("//div[@class='g']/div/h3/a").Attributes["href"].Value;
+
+
+                        //var page = new WebClient { UseDefaultCredentials = true }.DownloadString(url);
+
+                        //page = page.Substring(page.IndexOf("<div id=\"search\">"));
+                        //page = page.Substring(page.IndexOf("q=") + 2);
+                        //page = page.Substring(0, page.IndexOf("/&amp")).Replace("https://xkcd.com/", "");
+
+                        chosen =
+                        JsonConvert.DeserializeObject<XkcdPost>(
+                            new WebClient().DownloadString($"{page}/info.0.json"));
+
                     }
                 }
             }
