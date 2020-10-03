@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSChatBot-Core", "CSChatBot-Core\CSChatBot-Core.csproj", "{CEE593D5-9847-45BF-8ADC-B471B1B5849B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSChatBot-Core", "CSChatBot-Core\CSChatBot-Core.csproj", "{CEE593D5-9847-45BF-8ADC-B471B1B5849B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB", "DB\DB.csproj", "{DBE17B5C-D0A2-43FE-A669-6B9A9C367C91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DB", "DB\DB.csproj", "{DBE17B5C-D0A2-43FE-A669-6B9A9C367C91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csproj", "{C5DC7C1C-806F-49C9-90BA-C88C2B83233E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logger", "Logger\Logger.csproj", "{C5DC7C1C-806F-49C9-90BA-C88C2B83233E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModuleFramework", "ModuleFramework\ModuleFramework.csproj", "{FEEFC395-A20A-4958-8D20-C1F9507DBE88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModuleFramework", "ModuleFramework\ModuleFramework.csproj", "{FEEFC395-A20A-4958-8D20-C1F9507DBE88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModuleTemplate", "ModuleTemplate\ModuleTemplate.csproj", "{40A9F17D-9066-4AD3-9D45-D718DB892B7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FEEFC395-A20A-4958-8D20-C1F9507DBE88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEEFC395-A20A-4958-8D20-C1F9507DBE88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEEFC395-A20A-4958-8D20-C1F9507DBE88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40A9F17D-9066-4AD3-9D45-D718DB892B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A9F17D-9066-4AD3-9D45-D718DB892B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40A9F17D-9066-4AD3-9D45-D718DB892B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40A9F17D-9066-4AD3-9D45-D718DB892B7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

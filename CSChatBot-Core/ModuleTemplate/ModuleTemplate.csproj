@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
     <PackageReference Include="Telegram.Bot" Version="15.7.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DB\DB.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />
+    <ProjectReference Include="..\ModuleFramework\ModuleFramework.csproj" />
   </ItemGroup>
 
 </Project>
