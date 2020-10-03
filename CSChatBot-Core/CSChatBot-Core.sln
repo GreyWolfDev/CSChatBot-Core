@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XKCD", "XKCD\XKCD.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Giveaway", "Giveaway\Giveaway.csproj", "{00348DF6-8A41-428D-9885-955E29A1AF6A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steam", "Steam\Steam.csproj", "{11A27980-2EAF-45A9-9954-FBCB6A99B143}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{00348DF6-8A41-428D-9885-955E29A1AF6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00348DF6-8A41-428D-9885-955E29A1AF6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00348DF6-8A41-428D-9885-955E29A1AF6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11A27980-2EAF-45A9-9954-FBCB6A99B143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11A27980-2EAF-45A9-9954-FBCB6A99B143}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11A27980-2EAF-45A9-9954-FBCB6A99B143}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11A27980-2EAF-45A9-9954-FBCB6A99B143}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
