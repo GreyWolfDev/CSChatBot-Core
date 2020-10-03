@@ -291,7 +291,7 @@ namespace CSChatBot
                                     Send(new CommandResponse("You need to run this in a group"), update);
                                     return;
                                 }
-                                if (att.InPrivateOnly)
+                                if (att.InPrivateOnly && update.Message.Chat.Type != ChatType.Private)
                                 {
                                     Send(new CommandResponse("You need to run this in private"), update);
                                     return;
