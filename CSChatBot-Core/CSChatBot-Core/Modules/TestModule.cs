@@ -49,7 +49,7 @@ namespace CSChatBot.Modules
                 new InlineKeyboardButton()
                 {
                     Text = "Grey Wolf Dev Channel",
-                    Url="https://t.me/werewolfdev"
+                    Url="https://t.me/greywolfdev"
                 },
                 //can also use conditional statements when building menus
                 true ? new InlineKeyboardButton() {Text = "Para's Channel", Url="https://t.me/para949"} : null
@@ -110,16 +110,16 @@ namespace CSChatBot.Modules
             var b = args.Bot;
 
             b.SendTextMessageAsync(id, "Getting boolean value, default false.");
-            var value = group.GetSetting<bool>("TestBool", args.DatabaseInstance, false);
+            var value = group.GetSetting("TestBool", args.DatabaseInstance, false);
             Thread.Sleep(500);
             b.SendTextMessageAsync(id, $"Result: {value}\nSetting to true...");
-            var success = group.SetSetting<bool>("TestBool", args.DatabaseInstance, false, true);
-            value = group.GetSetting<bool>("TestBool", args.DatabaseInstance, false);
+            var success = group.SetSetting("TestBool", args.DatabaseInstance, false, true);
+            value = group.GetSetting("TestBool", args.DatabaseInstance, false);
             Thread.Sleep(500);
             b.SendTextMessageAsync(id, $"Update result: {success}\nCurrent value for test setting: {value}\nSetting to false");
 
-            success = group.SetSetting<bool>("TestBool", args.DatabaseInstance, false, false);
-            value = group.GetSetting<bool>("TestBool", args.DatabaseInstance, false);
+            success = group.SetSetting("TestBool", args.DatabaseInstance, false, false);
+            value = group.GetSetting("TestBool", args.DatabaseInstance, false);
             Thread.Sleep(500);
             b.SendTextMessageAsync(id, $"Update result: {success}\nCurrent value for test setting: {value}");
             return null;

@@ -92,6 +92,7 @@ namespace CSChatBot.Modules
             if (target != null && target.ID != args.SourceUser.ID)
             {
                 target.IsBotAdmin = true;
+                target.Save(args.DatabaseInstance);
                 return new CommandResponse($"{target.Name} is now a bot admin.");
             }
             return new CommandResponse(null);
@@ -104,6 +105,7 @@ namespace CSChatBot.Modules
             if (target != null && target.ID != args.SourceUser.ID)
             {
                 target.IsBotAdmin = false;
+                target.Save(args.DatabaseInstance);
                 return new CommandResponse($"{target.Name} is no longer a bot admin.");
             }
             return new CommandResponse(null);

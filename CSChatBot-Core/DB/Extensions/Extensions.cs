@@ -40,7 +40,7 @@ namespace DB.Extensions
 
         public static bool ExistsInDb(this User user, Instance db)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM Users WHERE ID = '{user.ID}'");
+            var rows = db.Connection.Query("SELECT COUNT(1) as 'Count' FROM Users WHERE ID = @ID", user);
             return (int)rows.First().Count > 0;
         }
 
@@ -58,7 +58,7 @@ namespace DB.Extensions
         /// <param name="db">The database instance</param>
         /// <param name="def">The default value for the field</param>
         /// <returns></returns>
-        public static T GetSetting<T>(this User user, string field, Instance db, object def)
+        public static T GetSetting<T>(this User user, string field, Instance db, T def)
         {
             if (db.Connection.State != ConnectionState.Open)
                 db.Connection.Open();
@@ -70,10 +70,13 @@ namespace DB.Extensions
             {
                 if (String.Equals(columns[1].ToString(), field))
                 {
-                    var result = new SQLiteCommand($"select {field} from users where ID = {user.ID}", db.Connection).ExecuteScalar();
-                    if (t != null && t.GetType() == typeof(bool))
+                    var result = db.Connection.ExecuteScalar($"select [{field}] from users where ID = @ID", new { user.ID });
+                    if (t != null)
                     {
-                        result = (result.ToString() == "1"); //make it a boolean value
+                        if (t.GetType() == typeof(bool))
+                            result = result.ToString() == "1"; // convert to boolean
+                        else if (t.GetType() == typeof(int))
+                            result = Convert.ToInt32((long)result); // convert int64 to int32
                     }
                     return (T)result;
                 }
@@ -85,11 +88,10 @@ namespace DB.Extensions
                 type = "INTEGER";
             else if (t.GetType() == typeof(bool))
                 type = "INTEGER";
-            
-            new SQLiteCommand($"ALTER TABLE users ADD COLUMN {field} {type} DEFAULT {(type == "INTEGER" ? def : $"'{def}'")};", db.Connection)
-                .ExecuteNonQuery();
-            return (T)def;
 
+            var d = def.FormatSQL();
+            db.ExecuteNonQuery($"ALTER TABLE users ADD COLUMN [{field}] {type} DEFAULT {d}");
+            return def;
         }
 
         /// <summary>
@@ -101,7 +103,7 @@ namespace DB.Extensions
         /// <param name="db">The database instance</param>
         /// <param name="def">The default value for the field</param>
         /// <returns></returns>
-        public static bool SetSetting<T>(this User user, string field, Instance db, object def, object value)
+        public static bool SetSetting<T>(this User user, string field, Instance db, T def, T value)
         {
             try
             {
@@ -127,11 +129,11 @@ namespace DB.Extensions
                 }
                 if (!settingExists)
                 {
-                    new SQLiteCommand($"ALTER TABLE users ADD COLUMN {field} {type} DEFAULT {(type == "INTEGER" ? def : $"'{def}'")};", db.Connection)
-                        .ExecuteNonQuery();
+                    var d = def.FormatSQL();
+                    db.ExecuteNonQuery($"ALTER TABLE users ADD COLUMN [{field}] {type} DEFAULT {d}");
                 }
 
-                new SQLiteCommand($"UPDATE users set {field} = {(type == "INTEGER" ? (t != null && t.GetType() == typeof(bool)) ? (bool)value ? "1" : "0" : value : $"'{value}'")} where ID = {user.ID}", db.Connection).ExecuteNonQuery();
+                db.ExecuteNonQuery($"UPDATE users set [{field}] = @value where ID = @ID", new { value, user.ID });
 
                 return true;
             }
@@ -145,30 +147,30 @@ namespace DB.Extensions
 
         #region Groups
 
-        public static void Save(this Group u, Instance db)
+        public static void Save(this Group g, Instance db)
         {
-            if (u.ID == null || !ExistsInDb(u, db))
+            if (g.ID == null || !ExistsInDb(g, db))
             {
                 //need to insert
                 db.ExecuteNonQuery(
                     "insert into chatgroup (GroupId, Name, UserName, MemberCount) VALUES (@GroupId, @Name, @UserName, @MemberCount)",
-                    u);
-                u.ID =
+                    g);
+                g.ID =
                     db.Connection.Query<int>(
-                        $"SELECT ID FROM chatgroup WHERE GroupId = @GroupId", u)
+                        $"SELECT ID FROM chatgroup WHERE GroupId = @GroupId", g)
                         .First();
             }
             else
             {
                 db.ExecuteNonQuery(
                     "UPDATE chatgroup SET GroupId = @GroupId, Name = @Name, UserName = @UserName, MemberCount = @MemberCount WHERE ID = @ID",
-                    u);
+                    g);
             }
         }
 
         public static bool ExistsInDb(this Group group, Instance db)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM chatgroup WHERE ID = '{group.ID}'");
+            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM chatgroup WHERE ID = @ID", group);
             return (int)rows.First().Count > 0;
         }
 
@@ -186,7 +188,7 @@ namespace DB.Extensions
         /// <param name="db">The database instance</param>
         /// <param name="def">The default value for the field</param>
         /// <returns></returns>
-        public static T GetSetting<T>(this Group group, string field, Instance db, object def)
+        public static T GetSetting<T>(this Group group, string field, Instance db, T def)
         {
             if (db.Connection.State != ConnectionState.Open)
                 db.Connection.Open();
@@ -197,10 +199,13 @@ namespace DB.Extensions
             {
                 if (String.Equals(columns[1].ToString(), field))
                 {
-                    var result = new SQLiteCommand($"select {field} from chatgroup where ID = {group.ID}", db.Connection).ExecuteScalar();
-                    if (t != null && t.GetType() == typeof(bool))
+                    var result = db.Connection.ExecuteScalar($"select [{field}] from chatgroup where ID = @ID", new { group.ID });
+                    if (t != null)
                     {
-                        result = (result.ToString() == "1"); //make it a boolean value
+                        if (t.GetType() == typeof(bool))
+                            result = result.ToString() == "1"; // convert to boolean
+                        else if (t.GetType() == typeof(int))
+                            result = Convert.ToInt32((long)result); // convert int64 to int32
                     }
                     return (T)result;
                 }
@@ -212,10 +217,10 @@ namespace DB.Extensions
                 type = "INTEGER";
             else if (t.GetType() == typeof(bool))
                 type = "INTEGER";
-            new SQLiteCommand($"ALTER TABLE chatgroup ADD COLUMN {field} {type} DEFAULT {(type == "INTEGER" ? def : $"'{def}'")};", db.Connection)
-                .ExecuteNonQuery();
-            return (T)def;
 
+            var d = def.FormatSQL();
+            db.ExecuteNonQuery($"ALTER TABLE chatgroup ADD [{field}] {type} DEFAULT {d}");
+            return def;
         }
 
         /// <summary>
@@ -227,7 +232,7 @@ namespace DB.Extensions
         /// <param name="db">The database instance</param>
         /// <param name="def">The default value for the field</param>
         /// <returns></returns>
-        public static bool SetSetting<T>(this Group group, string field, Instance db, object def, object value)
+        public static bool SetSetting<T>(this Group group, string field, Instance db, T def, T value)
         {
             try
             {
@@ -253,11 +258,11 @@ namespace DB.Extensions
                 }
                 if (!settingExists)
                 {
-                    new SQLiteCommand($"ALTER TABLE chatgroup ADD COLUMN {field} {type} DEFAULT {(type == "INTEGER" ? def : $"'{def}'")};", db.Connection)
-                        .ExecuteNonQuery();
+                    var d = def.FormatSQL();
+                    db.ExecuteNonQuery($"ALTER TABLE chatgroup ADD [{field}] {type} DEFAULT {d}");
                 }
 
-                new SQLiteCommand($"UPDATE chatgroup set {field} = {(type == "INTEGER" ? (t != null && t.GetType() == typeof(bool)) ? (bool)value ? "1" : "0" : value : $"'{value}'")} where ID = {group.ID}", db.Connection).ExecuteNonQuery();
+                db.ExecuteNonQuery($"UPDATE chatgroup set [{field}] = @value WHERE ID = @ID", new { value, group.ID });
 
                 return true;
             }
@@ -291,7 +296,7 @@ namespace DB.Extensions
 
         public static bool ExistsInDb(this Setting set, Instance db)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM settings WHERE ID = '{set.ID}'");
+            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM settings WHERE ID = @ID", set);
             return (int)rows.First().Count > 0;
         }
 
@@ -301,56 +306,97 @@ namespace DB.Extensions
         }
 
         /// <summary>
-        /// Adds a field to the settings table, if needed
+        /// Gets a setting from the database
         /// </summary>
-        /// <param name="set">the current settings loaded</param>
-        /// <param name="db">Instance of the database</param>
-        /// <param name="field">Name of the field you need</param>
-        /// <returns>Whether or not the field was missing / was added</returns>
-        public static bool AddField(this Setting set, Instance db, string field)
+        /// <typeparam name="T">The type the setting should be (bool, int, string)</typeparam>
+        /// <param name="set">The setting to read from</param>
+        /// <param name="field">The name of the setting</param>
+        /// <param name="db">The database instance</param>
+        /// <param name="def">The default value for the field</param>
+        /// <returns></returns>
+        public static T GetSetting<T>(this Setting set, string field, Instance db, T def)
         {
             if (db.Connection.State != ConnectionState.Open)
                 db.Connection.Open();
             //verify settings exist
             var columns = new SQLiteCommand("PRAGMA table_info(settings)", db.Connection).ExecuteReader();
-            var settingExists = false;
+            var t = default(T);
             while (columns.Read())
             {
                 if (String.Equals(columns[1].ToString(), field))
-                    settingExists = true;
+                {
+                    var result = db.Connection.ExecuteScalar($"select [{field}] from settings where ID = @ID", new { set.ID });
+                    if (t != null)
+                    {
+                        if (t.GetType() == typeof(bool))
+                            result = result.ToString() == "1"; // convert to boolean
+                        else if (t.GetType() == typeof(int))
+                            result = Convert.ToInt32((long)result); // convert int64 to int32
+                    }
+                    return (T)result;
+                }
             }
+            var type = "BLOB";
+            if (t == null)
+                type = "TEXT";
+            else if (t.GetType() == typeof(int))
+                type = "INTEGER";
+            else if (t.GetType() == typeof(bool))
+                type = "INTEGER";
 
-            if (!settingExists)
-            {
-                new SQLiteCommand($"ALTER TABLE settings ADD COLUMN {field} TEXT DEFAULT '';", db.Connection)
-                    .ExecuteNonQuery();
-                return true;
-            }
-
-            return false;
+            var d = def.FormatSQL();
+            db.ExecuteNonQuery($"ALTER TABLE settings ADD [{field}] {type} DEFAULT {d}");
+            return (T)def;
         }
-
 
         /// <summary>
-        /// Returns the requested field from settings.
+        /// Writes a setting to the database
         /// </summary>
-        /// <param name="set"></param>
-        /// <param name="db"></param>
-        /// <param name="field"></param>
+        /// <typeparam name="T">The type the setting should be (bool, int, string)</typeparam>
+        /// <param name="set">The setting to be edited</param>
+        /// <param name="field">The name of the setting</param>
+        /// <param name="db">The database instance</param>
+        /// <param name="def">The default value for the field</param>
         /// <returns></returns>
-        public static string GetString(this Setting set, Instance db, string field)
+        public static bool SetSetting<T>(this Setting set, string field, Instance db, T def, T value)
         {
-            return
-                db.Connection.Query<string>($"select {field} from settings where Alias = '{set.Alias}'")
-                    .FirstOrDefault();
-        }
+            try
+            {
+                if (db.Connection.State != ConnectionState.Open)
+                    db.Connection.Open();
+                //verify settings exist
+                var columns = new SQLiteCommand("PRAGMA table_info(settings)", db.Connection).ExecuteReader();
+                var t = default(T);
+                var type = "BLOB";
+                if (t == null)
+                    type = "TEXT";
+                else if (t.GetType() == typeof(int))
+                    type = "INTEGER";
+                else if (t.GetType() == typeof(bool))
+                    type = "INTEGER";
+                bool settingExists = false;
+                while (columns.Read())
+                {
+                    if (String.Equals(columns[1].ToString(), field))
+                    {
+                        settingExists = true;
+                    }
+                }
+                if (!settingExists)
+                {
+                    var d = def.FormatSQL();
+                    db.ExecuteNonQuery($"ALTER TABLE settings ADD [{field}] {type} DEFAULT {d}");
+                }
 
-        public static void SetString(this Setting set, Instance db, string field, string value)
-        {
-            new SQLiteCommand($"Update settings set {field} = '{value}' WHERE Alias = '{set.Alias}'", db.Connection)
-                .ExecuteNonQuery();
-        }
+                db.ExecuteNonQuery($"UPDATE settings set [{field}] = @value WHERE ID = @ID", new { value, set.ID });
 
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         #endregion
 
         public static string ExecuteQuery(this Instance db, string commandText, object param = null)
@@ -449,6 +495,20 @@ namespace DB.Extensions
                             String.Equals(x.UserId.ToString(), args, StringComparison.InvariantCultureIgnoreCase) ||
                             String.Equals(x.UserName, args.Replace("@", ""), StringComparison.InvariantCultureIgnoreCase));
             return result ?? sourceUser;
+        }
+
+        /// <summary>
+        /// Prepare an object for use in SQL query
+        /// </summary>
+        /// <param name="o">The object that's supposed to be used in the SQL query</param>
+        /// <returns>The escaped <paramref name="o"/> that is safe for use in SQL queries</returns>
+        public static string FormatSQL(this object o)
+        {
+            if (o == null) return "null";
+            if (o.GetType() == typeof(bool)) return (bool)o ? "1" : "0";
+            if (o.GetType() == typeof(int) || o.GetType() == typeof(long)) return o.ToString();
+
+            return $"'{o.ToString().Replace("'", "''").Replace("\"", "\"\"")}'";
         }
         #endregion
     }

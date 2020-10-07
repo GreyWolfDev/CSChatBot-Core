@@ -33,13 +33,13 @@ namespace Giveaway.Extensions
 
         public static bool HasActiveGiveaway(this User u, Instance db)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveaway WHERE Owner = '{u.UserId}' AND Active = 1");
+            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveaway WHERE Owner = @UserId AND Active = 1", u);
             return (int)rows.First().Count > 0;
         }
 
         public static bool ExistsInDb(this Models.Giveaway g, Instance db)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveaway WHERE ID = '{g.ID}'");
+            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveaway WHERE ID = @ID", g);
             return (int)rows.First().Count > 0;
         }
 
@@ -50,31 +50,31 @@ namespace Giveaway.Extensions
 
         public static bool HasUser(this Models.Giveaway g, Instance db, int userid)
         {
-            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveawayuser WHERE UserId = '{userid}' AND GiveawayId = '{g.ID}'");
+            var rows = db.Connection.Query($"SELECT COUNT(1) as 'Count' FROM giveawayuser WHERE UserId = @userid AND GiveawayId = @ID", new { userid, g.ID });
             return (int)rows.First().Count > 0;
         }
 
         public static void AddUser(this Models.Giveaway g, Instance db, int userid)
         {
             db.ExecuteNonQuery(
-                    $"insert into giveawayuser (UserId, GiveawayId) VALUES ({userid}, {g.ID})");
+                    $"insert into giveawayuser (UserId, GiveawayId) VALUES (@userid, @ID)", new { userid, g.ID });
         }
 
         public static Models.Giveaway GetGiveaway(this Instance db, string id)
         {
 
-            return db.Connection.Query<Models.Giveaway>($"select * from giveaway WHERE ID = {id} ").FirstOrDefault();
+            return db.Connection.Query<Models.Giveaway>($"select * from giveaway WHERE ID = @id", new { id }).FirstOrDefault();
         }
 
         public static Models.Giveaway GetGiveaway(this Instance db, User u, bool active = true)
         {
             var a = active ? 1 : 0;
-            return db.Connection.Query<Models.Giveaway>($"select * from giveaway WHERE Owner = {u.UserId} AND Active = {a} order by ID desc").FirstOrDefault();
+            return db.Connection.Query<Models.Giveaway>($"select * from giveaway WHERE Owner = @UserId AND Active = @a order by ID desc", new { u.UserId, a }).FirstOrDefault();
         }
 
         public static IEnumerable<User> GetUsers(this Models.Giveaway g, Instance db)
         {
-            var userIds = db.Connection.Query<int>($"select UserId from giveawayuser where GiveawayId = {g.ID}").ToList();
+            var userIds = db.Connection.Query<int>($"select UserId from giveawayuser where GiveawayId = @ID", g).ToList();
             return db.Users.Where(x => userIds.Contains(x.UserId));
         }
         #endregion
