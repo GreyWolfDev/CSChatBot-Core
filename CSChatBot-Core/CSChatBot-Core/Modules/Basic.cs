@@ -41,7 +41,7 @@ namespace CSChatBot.Modules
                 var doc = web.Load(url);
 
                 string quickanswer = "";
-                var answerbox = doc.DocumentNode.SelectSingleNode("//div[@role='heading']/div");
+                var answerbox = doc.DocumentNode.SelectSingleNode("//div[@role='heading']/div[not(descendant::a)]");
                 if (answerbox != null)
                 {
                     quickanswer = "Quick answer: ";
