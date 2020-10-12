@@ -74,29 +74,29 @@ namespace DB
 
         public User GetUser(int ID)
         {
-            return Connection.Query<User>($"select * from users where ID = {ID}").FirstOrDefault();
+            return Connection.Query<User>($"select * from users where ID = @ID", new { ID }).FirstOrDefault();
         }
 
         [Obsolete("Do not search by name, Telegram allows multiple users with same name")]
         public User GetUserByName(string nick)
         {
-            return Connection.Query<User>($"select * from users where Name = '{nick}'").FirstOrDefault();
+            return Connection.Query<User>($"select * from users where Name = @nick", new { nick }).FirstOrDefault();
         }
 
         public User GetUserById(int Id)
         {
-            return Connection.Query<User>($"select * from users where UserId = {Id}").FirstOrDefault();
+            return Connection.Query<User>($"select * from users where UserId = @Id", new { Id }).FirstOrDefault();
         }
 
         public Group GetGroup(int ID)
         {
-            return Connection.Query<Group>($"select * from chatgroup where ID = {ID}").FirstOrDefault();
+            return Connection.Query<Group>($"select * from chatgroup where ID = @ID", new { ID }).FirstOrDefault();
         }
 
 
         public Group GetGroupById(long Id)
         {
-            return Connection.Query<Group>($"select * from chatgroup where GroupId = {Id}").FirstOrDefault();
+            return Connection.Query<Group>($"select * from chatgroup where GroupId = @Id", new { Id }).FirstOrDefault();
         }
     }
 }

@@ -23,15 +23,14 @@ namespace Steam
         private static string _steamKey;
         public Steam(Instance db, Setting settings, TelegramBotClient bot)
         {
-            settings.AddField(db, "SteamKey");
-            var steamKey = settings.GetString(db, "SteamKey");
+            var steamKey = settings.GetSetting("SteamKey", db, "");
             if (String.IsNullOrWhiteSpace(steamKey))
             {
                 //now ask for the API Key
                 Console.Clear();
                 Console.Write("What is your Steam API key? : ");
                 steamKey = Console.ReadLine();
-                settings.SetString(db, "SteamKey", steamKey);
+                settings.SetSetting("SteamKey", db, "", steamKey);
             }
             if (String.IsNullOrEmpty(steamKey)) return;
             _steamKey = steamKey;
